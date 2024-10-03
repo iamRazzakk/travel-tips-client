@@ -3,17 +3,18 @@
 import { Button } from "@nextui-org/button";
 import { FormProvider, useForm } from "react-hook-form";
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { useRouter } from "next/navigation";
 
 import TInput from "@/src/components/Form/TInput/TInput";
 import TLabel from "@/src/components/Form/TLabel/TLabel";
+import nexiosInstance from "@/src/config/nexios.config";
 
 const Login = () => {
   const methods = useForm();
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     const { email, password } = data;
 
     // Reset error before validation
@@ -26,9 +27,11 @@ const Login = () => {
       return;
     }
 
-    // Handle successful sign-in (e.g., API call)
-    console.log("Sign-In Data", data);
-    // Example: You could add API call here to log in the user
+    const loginAPi = await nexiosInstance.post("/auth/login", data);
+    if (res.status === 200) {
+      const { accessToken, refreshToken } = res.data;
+    }
+    console.log(loginAPi);
   };
 
   return (
