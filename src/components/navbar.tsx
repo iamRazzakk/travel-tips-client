@@ -1,5 +1,6 @@
-/* eslint-disable import/order */
-"use client";
+// NavbarPageClient.tsx (Client Component)
+"use client"; // This is a client component
+
 import {
   Navbar,
   NavbarBrand,
@@ -15,8 +16,12 @@ import {
 import { ThemeSwitch } from "./theme-switch";
 import Image from "next/image";
 import logo from "../assets/logo.png";
-export const NavbarPage = () => {
-  const user = undefined;
+import { logOut } from "../services/AuthService";
+
+const NavbarPage = ({ user }) => {
+  const handleLogout = async () => {
+    logOut(); // Call the logout function when user clicks log out
+  };
 
   return (
     <Navbar>
@@ -62,28 +67,22 @@ export const NavbarPage = () => {
               as="button"
               className="transition-transform"
               color="secondary"
-              name="Jason Hughes"
+              name={user ? user.name : "Guest"}
               size="sm"
-              src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+              src={
+                user
+                  ? `https://i.pravatar.cc/150?u=${user.email}`
+                  : "https://i.pravatar.cc/150?u=guest"
+              }
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
-            <DropdownItem key="profile" className="h-14 gap-2">
-              <p className="font-semibold">Signed in as</p>
-              <p className="font-semibold">zoey@example.com</p>
-            </DropdownItem>
-            <DropdownItem key="settings">My Settings</DropdownItem>
-            <DropdownItem key="team_settings">Team Settings</DropdownItem>
-            <DropdownItem key="analytics">Analytics</DropdownItem>
-            <DropdownItem key="system">System</DropdownItem>
-            <DropdownItem key="configurations">Configurations</DropdownItem>
-            <DropdownItem key="help_and_feedback">Help & Feedback</DropdownItem>
             {user ? (
               <>
                 <DropdownItem key="profile" className="h-14 gap-2">
                   <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold">{user?.email}</p>{" "}
-                  {/* Replace with actual user email */}
+                  <p className="font-semibold">{user.email}</p>{" "}
+                  {/* Display user email */}
                 </DropdownItem>
                 <DropdownItem key="settings">My Settings</DropdownItem>
                 <DropdownItem key="team_settings">Team Settings</DropdownItem>
@@ -93,13 +92,18 @@ export const NavbarPage = () => {
                 <DropdownItem key="help_and_feedback">
                   Help & Feedback
                 </DropdownItem>
-                <DropdownItem key="logout" color="danger">
+                <DropdownItem
+                  onClick={handleLogout}
+                  key="logout"
+                  color="danger"
+                >
                   Log Out
                 </DropdownItem>
               </>
             ) : (
               <DropdownItem key="login" color="primary">
-                <Link href="/login">Log In</Link>
+                <Link href="/login">Log In</Link>{" "}
+                {/* Display login link if no user is logged in */}
               </DropdownItem>
             )}
           </DropdownMenu>
@@ -108,3 +112,4 @@ export const NavbarPage = () => {
     </Navbar>
   );
 };
+export default NavbarPage;

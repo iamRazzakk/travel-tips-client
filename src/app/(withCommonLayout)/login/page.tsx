@@ -4,10 +4,11 @@ import { Button } from "@nextui-org/button";
 import { FormProvider, useForm } from "react-hook-form";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+// import { cookies } from "next/headers";
 
 import TInput from "@/src/components/Form/TInput/TInput";
 import TLabel from "@/src/components/Form/TLabel/TLabel";
-import nexiosInstance from "@/src/config/nexios.config";
+import loginUser from "@/src/services/AuthService";
 
 const Login = () => {
   const methods = useForm();
@@ -26,12 +27,7 @@ const Login = () => {
 
       return;
     }
-
-    const loginAPi = await nexiosInstance.post("/auth/login", data);
-    if (res.status === 200) {
-      const { accessToken, refreshToken } = res.data;
-    }
-    console.log(loginAPi);
+    const res = loginUser(data);
   };
 
   return (
