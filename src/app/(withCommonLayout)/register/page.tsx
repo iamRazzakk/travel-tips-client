@@ -5,36 +5,37 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa6";
+import { useRouter } from "next/navigation";
 
 import CustomForm from "@/src/components/Form/CustomForm/CustomForm";
 import TLabel from "@/src/components/Form/TLabel/TLabel";
 import TInput from "@/src/components/Form/TInput/TInput";
 import TTextarea from "@/src/components/Form/TTextarea/TTextarea";
+import nexiosInstance from "@/src/config/nexios.config";
 
-const Register = () => {
+const Register = async () => {
   const [error, setError] = useState<string | null>(null);
-  const onSubmit = (data: any) => {
-    const { fullName, email, password, confirmPassword, bio, location } = data;
+  const router = useRouter();
+  const onSubmit = async (data: any) => {
+    const { name, email, password, confirmPassword, bio, address } = data;
 
     // Reset error before validation
     setError(null);
+    try {
+      // Make API call to register user
+      const res = await nexiosInstance.post("/auth/signup", data);
 
-    // Form validation logic
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-
-      return;
+      // Handle successful registration
+      if (res.status === 201) {
+        toast.success("User registration successful");
+        router.push("/login");
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.message || "An unexpected error occurred.");
+      toast.error("Registration failed");
     }
-
-    // Handle successful registration (e.g., API call)
-    console.log("Registration Data", {
-      fullName,
-      email,
-      password,
-      bio,
-      location,
-    });
-    toast.success("User registration successfully");
   };
 
   return (
@@ -48,11 +49,7 @@ const Register = () => {
           <TLabel className="text-md " htmlFor="fullName">
             Full Name
           </TLabel>
-          <TInput
-            name="fullName"
-            placeholder="Enter your full name"
-            type="text"
-          />
+          <TInput name="name" placeholder="Enter your full name" type="text" />
         </div>
 
         {/* Email */}
@@ -75,18 +72,6 @@ const Register = () => {
           />
         </div>
 
-        {/* Confirm Password */}
-        <div>
-          <TLabel className="text-md " htmlFor="confirmPassword">
-            Confirm Password
-          </TLabel>
-          <TInput
-            name="confirmPassword"
-            placeholder="Confirm your password"
-            type="password"
-          />
-        </div>
-
         {/* Short Bio */}
         <div>
           <TLabel className="text-md " htmlFor="bio">
@@ -101,7 +86,7 @@ const Register = () => {
             Country/Location
           </TLabel>
           <TInput
-            name="location"
+            name="address"
             placeholder="Enter your country or location"
             type="text"
           />
@@ -114,6 +99,16 @@ const Register = () => {
         <Button className="w-full" type="submit">
           Register
         </Button>
+        {/* Navigation to Register Page */}
+        <p className="text-center mt-4">
+          have an account?{" "}
+          <span
+            className="text-blue-500 cursor-pointer hover:underline"
+            onClick={() => router.push("/login")}
+          >
+            Login here
+          </span>
+        </p>
       </CustomForm>
 
       {/* Google Signup Button */}
