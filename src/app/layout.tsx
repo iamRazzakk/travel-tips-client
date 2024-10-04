@@ -2,7 +2,10 @@ import "@/src/styles/globals.css";
 import { Metadata, Viewport } from "next";
 import clsx from "clsx";
 
-import { NavbarPage } from "../components/navbar";
+// import { NavbarPage } from "../components/navbar";
+
+import { getCurrentUser } from "../services/AuthService";
+import NavbarPage from "../components/navbar";
 
 import { Providers } from "./providers";
 
@@ -32,6 +35,8 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const user = getCurrentUser();
+
   return (
     <html suppressHydrationWarning lang="en">
       <head />
@@ -43,9 +48,8 @@ export default function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
-            <NavbarPage />
-
             <main className="container mx-auto max-w-7xl pt-4 px-6 flex-grow">
+              <NavbarPage user={user} />
               {children}
             </main>
           </div>

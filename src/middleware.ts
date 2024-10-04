@@ -22,9 +22,9 @@ export async function middleware(request: NextRequest) {
         if (AuthRoute.includes(pathname)) {
             return NextResponse.next();
         } else {
-            return NextResponse.redirect(
-                new URL(`/login?redirect=${pathname}`, request.url),
-            );
+            // return NextResponse.redirect(
+            //     new URL(`/login?redirect=${pathname}`, request.url),
+            // );
         }
     }
 
@@ -41,5 +41,5 @@ export async function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-    matcher: ["/login"],
+    matcher: [],
 }

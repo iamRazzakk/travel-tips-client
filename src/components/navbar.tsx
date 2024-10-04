@@ -1,115 +1,135 @@
-// NavbarPageClient.tsx (Client Component)
-"use client"; // This is a client component
-
+"use client";
 import {
   Navbar,
   NavbarBrand,
   NavbarContent,
   NavbarItem,
   Link,
+  Input,
   DropdownItem,
   DropdownTrigger,
   Dropdown,
   DropdownMenu,
   Avatar,
 } from "@nextui-org/react";
-import { ThemeSwitch } from "./theme-switch";
 import Image from "next/image";
+import { useState } from "react";
+import { toast } from "sonner";
+
 import logo from "../assets/logo.png";
 import { logOut } from "../services/AuthService";
 
-const NavbarPage = ({ user }) => {
+export default function NavbarPage({ user }) {
+  const [userData, setUserData] = useState(user);
+
   const handleLogout = async () => {
-    logOut(); // Call the logout function when user clicks log out
+    try {
+      await logOut();
+      setUserData(null);
+      toast.success("Logged out successfully!");
+    } catch (error) {
+      toast.error("Logout failed!");
+    }
   };
 
   return (
-    <Navbar>
-      <NavbarBrand>
-        <Image
-          alt="Travel Tips & Destination Guides logo"
-          className="rounded-full"
-          height={40}
-          src={logo}
-          width={60}
-        />
-      </NavbarBrand>
-
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
-        <NavbarItem>
-          <Link color="foreground" href="/">
-            Home
+    <Navbar isBordered>
+      <NavbarContent justify="start">
+        <NavbarBrand className="mr-4">
+          <Link href="/">
+            <Image
+              alt="logo"
+              className="rounded-3xl"
+              height={30}
+              src={logo}
+              width={40}
+            />
           </Link>
-        </NavbarItem>
-        <NavbarItem isActive>
-          <Link aria-current="page" color="secondary" href="#">
-            Destinations
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Travel Tips
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" href="#">
-            Premium Content
-          </Link>
-        </NavbarItem>
+        </NavbarBrand>
+        <NavbarContent className="hidden sm:flex gap-3">
+          <NavbarItem>
+            <Link color="foreground" href="/">
+              Home
+            </Link>
+          </NavbarItem>
+          <NavbarItem isActive>
+            <Link aria-current="page" color="secondary" href="/categories">
+              Categories
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link color="foreground" href="/create-post">
+              Create Post
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link color="foreground" href="/following">
+              Following
+            </Link>
+          </NavbarItem>
+          <NavbarItem>
+            <Link color="foreground" href="/premium">
+              Premium
+            </Link>
+          </NavbarItem>
+        </NavbarContent>
       </NavbarContent>
 
-      <NavbarContent as="div" justify="end">
-        <ThemeSwitch />
-        <Dropdown placement="bottom-end">
-          <DropdownTrigger>
-            <Avatar
-              isBordered
-              as="button"
-              className="transition-transform"
-              color="secondary"
-              name={user ? user.name : "Guest"}
-              size="sm"
-              src={
-                user
-                  ? `https://i.pravatar.cc/150?u=${user.email}`
-                  : "https://i.pravatar.cc/150?u=guest"
-              }
-            />
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Profile Actions" variant="flat">
-            {user ? (
-              <>
-                <DropdownItem key="profile" className="h-14 gap-2">
-                  <p className="font-semibold">Signed in as</p>
-                  <p className="font-semibold">{user.email}</p>{" "}
-                  {/* Display user email */}
-                </DropdownItem>
-                <DropdownItem key="settings">My Settings</DropdownItem>
-                <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                <DropdownItem key="analytics">Analytics</DropdownItem>
-                <DropdownItem key="system">System</DropdownItem>
-                <DropdownItem key="configurations">Configurations</DropdownItem>
-                <DropdownItem key="help_and_feedback">
-                  Help & Feedback
-                </DropdownItem>
-                <DropdownItem
-                  onClick={handleLogout}
-                  key="logout"
-                  color="danger"
-                >
-                  Log Out
-                </DropdownItem>
-              </>
-            ) : (
-              <DropdownItem key="login" color="primary">
-                <Link href="/login">Log In</Link>{" "}
-                {/* Display login link if no user is logged in */}
+      <NavbarContent as="div" className="items-center" justify="end">
+        <Input
+          classNames={{
+            base: "max-w-full sm:max-w-[10rem] h-10",
+            mainWrapper: "h-full",
+            input: "text-small",
+            inputWrapper:
+              "h-full font-normal text-default-500 bg-default-400/20 dark:bg-default-500/20",
+          }}
+          placeholder="Type to search..."
+          size="sm"
+          type="search"
+        />
+        {userData ? (
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Avatar
+                isBordered
+                as="button"
+                className="transition-transform"
+                color="secondary"
+                name={userData.name}
+                size="sm"
+                src={
+                  userData.avatar ||
+                  "https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                } // Display user's avatar or default image
+              />
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Profile Actions" variant="flat">
+              <DropdownItem key="profile" className="">
+                <Link href="/profile">Profile</Link>
               </DropdownItem>
-            )}
-          </DropdownMenu>
-        </Dropdown>
+              <DropdownItem key="notifications">
+                <Link href="/notifications">Notifications</Link>
+              </DropdownItem>
+              <DropdownItem key="payment-history">
+                <Link href="/payment-history">Payment History</Link>
+              </DropdownItem>
+              <DropdownItem key="settings">
+                <Link href="/settings">Settings</Link>
+              </DropdownItem>
+              <DropdownItem key="logout" color="danger" onClick={handleLogout}>
+                Log Out
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        ) : (
+          <NavbarItem>
+            <Link color="primary" href="/login">
+              Log In
+            </Link>
+          </NavbarItem>
+        )}
       </NavbarContent>
     </Navbar>
   );
-};
-export default NavbarPage;
+}
