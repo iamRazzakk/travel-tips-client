@@ -11,7 +11,7 @@ import CustomForm from "@/src/components/Form/CustomForm/CustomForm";
 import TLabel from "@/src/components/Form/TLabel/TLabel";
 import TInput from "@/src/components/Form/TInput/TInput";
 import TTextarea from "@/src/components/Form/TTextarea/TTextarea";
-import nexiosInstance from "@/src/config/nexios.config";
+import { signUpUser } from "@/src/services/AuthService";
 
 const Register = async () => {
   const [error, setError] = useState<string | null>(null);
@@ -22,19 +22,11 @@ const Register = async () => {
     // Reset error before validation
     setError(null);
     try {
-      // Make API call to register user
-      const res = await nexiosInstance.post("/auth/signup", data);
-
-      // Handle successful registration
-      if (res.status === 201) {
-        toast.success("User registration successful");
-        router.push("/login");
-      } else {
-        setError("Registration failed. Please try again.");
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.message || "An unexpected error occurred.");
-      toast.error("Registration failed");
+      signUpUser(data);
+      toast.success("Registration successful");
+      router.push("/login");
+    } catch {
+      toast.error("Singup Field");
     }
   };
 

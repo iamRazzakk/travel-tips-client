@@ -9,11 +9,21 @@ export const loginUser = async (userData) => {
   try {
     const { data } = await axiosInstance.post("/auth/login", userData);
 
+    return data;
+  } catch (error) {
+    throw new Error(error?.message);
+  }
+};
+export const signUpUser = async (userData) => {
+  try {
+    const { data } = await axiosInstance.post("/auth/signup", userData);
+
     if (data.success) {
+      // Set tokens in cookies during signup
       cookies().set("accessToken", data.accessToken);
       cookies().set("refreshToken", data.refreshToken);
     } else {
-      throw new Error("Failed to login");
+      throw new Error("Failed to signup");
     }
 
     return data;
