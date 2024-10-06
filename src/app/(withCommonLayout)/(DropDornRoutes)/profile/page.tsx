@@ -1,12 +1,11 @@
 import Image from "next/image";
-import { getCurrentUser } from "@/src/services/AuthService";
-import { TUSER } from "@/src/types/userTypes/user.types";
-import nexiosInstance from "@/src/config/nexios.config";
-import { Card, CardBody } from "@nextui-org/card";
-import { Avatar } from "@nextui-org/avatar";
-import { Input, Textarea } from "@nextui-org/input";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/react";
+
+import { TUSER } from "@/src/types/userTypes/user.types";
+import { getCurrentUser } from "@/src/services/AuthService";
+import ProfileFormModal from "@/src/components/Profile/ProfileFromModal/ProfileFrom";
+import CreatePost from "@/src/components/Profile/CreatePost/CreatePost";
 
 const Profile = async () => {
   const user: TUSER = await getCurrentUser();
@@ -23,7 +22,7 @@ const Profile = async () => {
     followers: 100,
     following: 50,
     isVerified: false,
-    profileImage: "/placeholder-profile.png",
+    image: "/placeholder-profile.png",
   };
 
   // Use static data if user data is not available
@@ -35,11 +34,11 @@ const Profile = async () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-5">
           <Image
-            src={staticData.profileImage}
             alt="User Profile Picture"
-            height={80}
-            width={80}
             className="rounded-full border border-white"
+            height={80}
+            src={staticData.image}
+            width={80}
           />
           <div>
             <h1 className="text-2xl font-bold text-white">{user?.name}</h1>
@@ -49,7 +48,7 @@ const Profile = async () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button color="default">Edit Profile</Button>
+          <ProfileFormModal initialData={profileData} />
           <Button color="primary">Varifiey now</Button>
         </div>
       </div>
@@ -58,11 +57,9 @@ const Profile = async () => {
       <div className="flex items-center gap-4">
         <div className="w-1/3 bg-red-500">adsf</div>
         {/* post list */}
-        <div className="w-2/3 bg-green-500">
-          <div>
-            <h1>al;sdkjfalskdjfal;skdjfla;k</h1>
-            <p>alskdjfkla;sdjfl;kasdj</p>
-          </div>
+        <div className="w-2/3 ">
+          {/* create post */}
+          <CreatePost user={user} />
         </div>
       </div>
     </div>
