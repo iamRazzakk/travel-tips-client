@@ -1,12 +1,9 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable prettier/prettier */
 /* eslint-disable padding-line-between-statements */
 "use client";
 
 import defaultImage from "@/src/assets/userImage.jpg";
 import Image from "next/image";
 import { Select, SelectItem } from "@nextui-org/react";
-
 import {
   Button,
   Input,
@@ -21,8 +18,9 @@ import {
 import { TUSER } from "@/src/types/userTypes/user.types";
 import { useState } from "react";
 import nexiosInstance from "@/src/config/nexios.config";
-import { categories } from "./category";
+import { categories } from "./category"; // Assuming this array matches the backend category enums
 import { toast } from "sonner";
+import Cookies from "js-cookie";
 
 const CreatePost = ({ user }: { user: TUSER }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -33,8 +31,10 @@ const CreatePost = ({ user }: { user: TUSER }) => {
   const [images, setImages] = useState<FileList | null>(null);
   const [imageError, setImageError] = useState<string>("");
 
+  // Handle image selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
+    console.log(selectedFiles); // Should show all selected files
 
     if (selectedFiles && selectedFiles.length > 3) {
       setImageError("You can upload up to 3 images.");
@@ -42,51 +42,61 @@ const CreatePost = ({ user }: { user: TUSER }) => {
     }
 
     setImageError("");
-    setImages(selectedFiles);
+    setImages(selectedFiles); // Update the state with selected files
   };
 
-  const handleSubmit = async () => {
-    if (!title || !content || !category) {
-      alert("Please fill in the required fields.");
-      return;
+  // Handle category change
+  const handleCategoryChange = (selected: string[]) => {
+    if (selected.length > 0) {
+      setCategory(selected[0]);
     }
+  };
 
+  // Handle form submission
+  const handleSubmit = async () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
     formData.append("category", category);
     formData.append("isPremium", isPremium.toString());
-    formData.append("user", user?._id);
+    formData.append("user", user?._id); // Ensure user ID is valid
 
+    // Append images if any are selected
     if (images) {
       for (let i = 0; i < images.length; i++) {
-        formData.append("images", images[i]);
+        formData.append("file", images[i]); // Match "file" key from Postman
       }
     }
-
+    const accessToken = Cookies.get("accessToken");
     try {
+      // Log the FormData for debugging
+      formData.forEach((value, key) => {
+        console.log(`${key}: ${value}`);
+      });
+
+      // Make the API request without Bearer Token
       const response = await nexiosInstance.post(
-        "http://localhost:5001/api/v1/post",
-        formData,
+        "http://localhost:5001/api/v1/post", // Adjust the URL to match your API
+        formData, // Pass formData directly
         {
           headers: {
-            "Content-Type": "multipart/form-data",
-            // Authorization: `{}`,
+            "Content-Type": "multipart/form-data", // Ensure multipart handling
+            Authorization: `${accessToken}`,
           },
         }
       );
-      toast.success("Post created successfully");
 
-      onClose();
+      console.log("Post created successfully", response.data);
+      toast.success("Post created successfully");
+      onClose(); // Close the modal after successful submission
     } catch (error) {
-      console.error("Error creating post:", error);
-      toast.error("Failed to create post");
+      console.error("Error uploading post:", error);
+      toast.error("Error creating post. Please try again.");
     }
   };
 
   return (
     <>
-      {/* Clickable Input Field that opens the modal */}
       <div className="cursor-pointer" onClick={onOpen}>
         <Input
           placeholder="What's on your mind?"
@@ -104,7 +114,6 @@ const CreatePost = ({ user }: { user: TUSER }) => {
         />
       </div>
 
-      {/* Modal content for creating the post */}
       <Modal size="md" isOpen={isOpen} onClose={onClose}>
         <ModalContent>
           {(onClose) => (
@@ -137,9 +146,10 @@ const CreatePost = ({ user }: { user: TUSER }) => {
                   minRows={4}
                 />
                 <Select
-                  label="Categorys"
+                  label="Categories"
                   placeholder="Select a Category"
-                  selectionMode="multiple"
+                  selectionMode="single"
+                  onSelectionChange={handleCategoryChange}
                   className="max-w-xs"
                 >
                   {categories?.map((categorie, index) => (

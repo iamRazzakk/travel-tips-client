@@ -6,6 +6,7 @@ import { TUSER } from "@/src/types/userTypes/user.types";
 import { getCurrentUser } from "@/src/services/AuthService";
 import ProfileFormModal from "@/src/components/Profile/ProfileFromModal/ProfileFrom";
 import CreatePost from "@/src/components/Profile/CreatePost/CreatePost";
+import Posts from "@/src/components/Profile/CreatePost/Posts";
 
 const Profile = async () => {
   const user: TUSER = await getCurrentUser();
@@ -60,6 +61,10 @@ const Profile = async () => {
         <div className="w-2/3 ">
           {/* create post */}
           <CreatePost user={user} />
+          {/* total post */}
+          <div>
+            <Posts />
+          </div>
         </div>
       </div>
     </div>
