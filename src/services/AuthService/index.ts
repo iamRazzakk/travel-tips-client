@@ -1,6 +1,5 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
 
 import axiosInstance from "@/src/lib/axiosInstance";
@@ -20,8 +19,8 @@ export const signUpUser = async (userData) => {
 
     if (data.success) {
       // Set tokens in cookies during signup
-      cookies().set("accessToken", data.accessToken);
-      cookies().set("refreshToken", data.refreshToken);
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("refreshToken", data.refreshToken);
     } else {
       throw new Error("Failed to signup");
     }
@@ -33,12 +32,12 @@ export const signUpUser = async (userData) => {
 };
 
 export const logOut = () => {
-  cookies().delete("accessToken");
-  cookies().delete("refreshToken");
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
 };
 
 export const getCurrentUser = async () => {
-  const accessToken = cookies().get("accessToken")?.value;
+  const accessToken = localStorage.getItem("accessToken");
 
   if (!accessToken) {
     return null;

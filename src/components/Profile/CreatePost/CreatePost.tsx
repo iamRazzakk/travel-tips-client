@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
 /* eslint-disable prettier/prettier */
 /* eslint-disable padding-line-between-statements */
 "use client";
@@ -21,6 +22,7 @@ import { TUSER } from "@/src/types/userTypes/user.types";
 import { useState } from "react";
 import nexiosInstance from "@/src/config/nexios.config";
 import { categories } from "./category";
+import { toast } from "sonner";
 
 const CreatePost = ({ user }: { user: TUSER }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -54,7 +56,7 @@ const CreatePost = ({ user }: { user: TUSER }) => {
     formData.append("content", content);
     formData.append("category", category);
     formData.append("isPremium", isPremium.toString());
-    formData.append("user", user._id); // Append user ID
+    formData.append("user", user?._id);
 
     if (images) {
       for (let i = 0; i < images.length; i++) {
@@ -64,20 +66,21 @@ const CreatePost = ({ user }: { user: TUSER }) => {
 
     try {
       const response = await nexiosInstance.post(
-        "http://localhost:5001/api/v1/posts",
+        "http://localhost:5001/api/v1/post",
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            // Authorization: `{}`,
           },
         }
       );
-      alert("Post created successfully");
-      console.log(response.data);
-      onClose(); // Close modal after submission
+      toast.success("Post created successfully");
+
+      onClose();
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("Failed to create post");
+      toast.error("Failed to create post");
     }
   };
 
