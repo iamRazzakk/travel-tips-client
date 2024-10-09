@@ -35,7 +35,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = getCurrentUser();
+  // const user = getCurrentUser();
 
   return (
     <html suppressHydrationWarning lang="en">
@@ -43,13 +43,12 @@ export default function RootLayout({
       <body
         className={clsx(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable,
+          fontSans.variable
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <div className="relative flex flex-col h-screen">
             <main className="container mx-auto max-w-7xl pt-4 px-6 flex-grow">
-              <NavbarPage user={user} />
               {children}
             </main>
           </div>

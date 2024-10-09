@@ -14,6 +14,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import nexiosInstance from "@/src/config/nexios.config";
+import AxiosInstance from "@/src/lib/axiosInstance";
 
 interface ProfileFormProps {
   initialData: {
@@ -58,18 +59,18 @@ const ProfileFormModal: React.FC<ProfileFormProps> = ({ initialData }) => {
         role,
         bio,
         address,
-      }),
+      })
     ); // Append the JSON data
 
     try {
-      const response = await nexiosInstance.put(
+      const response = await AxiosInstance.post(
         `http://localhost:5001/api/v1/auth/user/${initialData._id}`,
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        },
+        }
       );
 
       if (response.status === 200) {
@@ -102,9 +103,7 @@ const ProfileFormModal: React.FC<ProfileFormProps> = ({ initialData }) => {
                       alt="Profile Picture"
                       className="rounded-full"
                       height={80}
-                      src={
-                        initialData.image || "/path/to/placeholder/image.png"
-                      } // Use a valid image path or URL
+                      src={initialData.image || ""}
                       width={80}
                     />
                     <input type="file" onChange={handleFileChange} />

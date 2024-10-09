@@ -21,6 +21,7 @@ import nexiosInstance from "@/src/config/nexios.config";
 import { categories } from "./category"; // Assuming this array matches the backend category enums
 import { toast } from "sonner";
 import Cookies from "js-cookie";
+import AxiosInstance from "@/src/lib/axiosInstance";
 
 const CreatePost = ({ user }: { user: TUSER }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -73,18 +74,8 @@ const CreatePost = ({ user }: { user: TUSER }) => {
       formData.forEach((value, key) => {
         console.log(`${key}: ${value}`);
       });
-
       // Make the API request without Bearer Token
-      const response = await nexiosInstance.post(
-        "http://localhost:5001/api/v1/post", // Adjust the URL to match your API
-        formData, // Pass formData directly
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // Ensure multipart handling
-            Authorization: `${accessToken}`,
-          },
-        }
-      );
+      const response = await AxiosInstance.post("/post", { formData });
 
       console.log("Post created successfully", response.data);
       toast.success("Post created successfully");

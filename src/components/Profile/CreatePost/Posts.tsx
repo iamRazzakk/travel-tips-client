@@ -17,8 +17,8 @@ const Posts = () => {
             cache: "no-store",
           }
         );
-        console.log("API Response:", response.data); // Log API response
-        setPosts(response?.data?.data); // Adjust according to your response structure
+        // console.log("API Response:", response.data);
+        setPosts(response?.data?.data);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching posts:", error);
@@ -30,14 +30,12 @@ const Posts = () => {
   }, []);
 
   if (loading) return <p>Loading posts...</p>;
-
+  console.log(posts);
   return (
-    <div>
-      {posts.length > 0 ? (
-        posts.map((post) => <PostCard key={post._id} post={post} />)
-      ) : (
-        <p>No posts available.</p>
-      )}
+    <div className="gap-3">
+      {posts.map((post) => (
+        <PostCard key={post._id} post={post} />
+      ))}
     </div>
   );
 };

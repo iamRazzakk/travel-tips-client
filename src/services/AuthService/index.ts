@@ -2,13 +2,23 @@
 
 import { cookies } from "next/headers";
 import { jwtDecode } from "jwt-decode";
+import AxiosInstance from "@/src/lib/axiosInstance";
 
-import axiosInstance from "@/src/lib/axiosInstance";
 
 export const loginUser = async (userData) => {
   try {
-    const { data } = await axiosInstance.post("/auth/login", userData);
+    const response = await AxiosInstance.post("/auth/login", userData);
+    const data = response.data; // Access the actual data from the response
 
+    console.log(data); // This will help debug the structure of your response
+
+    if (data.success) {
+      // Set tokens in cookies during login
+      cookies().set("accessToken", data.data.accessToken); // Corrected path to accessToken
+      cookies().set("refreshToken", data.data.refreshToken); // Corrected path to refreshToken
+    } else {
+      throw new Error("Failed to login");
+    }
     return data;
   } catch (error) {
     throw new Error(error?.message);
@@ -16,7 +26,7 @@ export const loginUser = async (userData) => {
 };
 export const signUpUser = async (userData) => {
   try {
-    const { data } = await axiosInstance.post("/auth/signup", userData);
+    const { data } = await AxiosInstance.post("/auth/signup", userData);
 
     if (data.success) {
       // Set tokens in cookies during signup
