@@ -13,8 +13,8 @@ import { Input, Textarea } from "@nextui-org/react";
 import { useState } from "react";
 import { toast } from "sonner";
 
-import nexiosInstance from "@/src/config/nexios.config";
 import AxiosInstance from "@/src/lib/axiosInstance";
+import UpdatApi from "./UpdatApi";
 
 interface ProfileFormProps {
   initialData: {
@@ -39,51 +39,45 @@ const ProfileFormModal: React.FC<ProfileFormProps> = ({ initialData }) => {
   const [address, setAddress] = useState(initialData.address || "");
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFile(e.target.files ? e.target.files[0] : null); // Set the selected file
+    setFile(e.target.files ? e.target.files[0] : null);
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true); // Start loading state
+    setLoading(true);
 
     const formData = new FormData();
 
-    formData.append("file", file!); // Append the selected file
+    // Validate the fields
+    // if (!name || !role || !bio || !address) {
+    //   toast.error("All fields are required.");
+    //   setLoading(false);
+    //   return;
+    // }
+
+    // Append the file and form data
+    if (file) {
+      formData.append("file", file);
+    }
+
     formData.append(
       "data",
       JSON.stringify({
         name,
-        password,
+        // password,
         role,
         bio,
         address,
       })
-    ); // Append the JSON data
+    );
 
-    try {
-      const response = await AxiosInstance.post(
-        `http://localhost:5001/api/v1/auth/user/${initialData._id}`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        toast.success("Profile updated successfully!");
-      } else {
-        toast.error("Failed to update profile.");
-      }
-    } catch (error) {
-      console.error("Error updating profile", error);
-      toast.error("Failed to update profile.");
-    } finally {
-      setLoading(false);
+    // Log the formData key-value pairs for debugging
+    for (let [key, value] of formData.entries()) {
+      console.log(key, value);
     }
+    UpdatApi(formData, initialData);
+    // Send the request (no need to set Content-Type for FormData)
   };
 
   return (
@@ -130,7 +124,8 @@ const ProfileFormModal: React.FC<ProfileFormProps> = ({ initialData }) => {
                       Cancel
                     </Button>
                     <Button color="primary" disabled={loading} type="submit">
-                      {loading ? "Updating..." : "Save Changes"}
+                      {/* {loading ? "Updating..." : "Save Changes"} */}
+                      Save change
                     </Button>
                   </ModalFooter>
                 </form>

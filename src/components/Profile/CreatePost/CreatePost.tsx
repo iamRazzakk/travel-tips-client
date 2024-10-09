@@ -1,6 +1,7 @@
 /* eslint-disable padding-line-between-statements */
 "use client";
 
+import Cookies from "js-cookie";
 import defaultImage from "@/src/assets/userImage.jpg";
 import Image from "next/image";
 import { Select, SelectItem } from "@nextui-org/react";
@@ -17,10 +18,9 @@ import {
 } from "@nextui-org/react";
 import { TUSER } from "@/src/types/userTypes/user.types";
 import { useState } from "react";
-import nexiosInstance from "@/src/config/nexios.config";
-import { categories } from "./category"; // Assuming this array matches the backend category enums
+import { categories } from "./category";
 import { toast } from "sonner";
-import Cookies from "js-cookie";
+import axios from "axios";
 import AxiosInstance from "@/src/lib/axiosInstance";
 
 const CreatePost = ({ user }: { user: TUSER }) => {
@@ -35,15 +35,14 @@ const CreatePost = ({ user }: { user: TUSER }) => {
   // Handle image selection
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = e.target.files;
-    console.log(selectedFiles); // Should show all selected files
-
+    console.log(selectedFiles);
     if (selectedFiles && selectedFiles.length > 3) {
       setImageError("You can upload up to 3 images.");
       return;
     }
 
     setImageError("");
-    setImages(selectedFiles); // Update the state with selected files
+    setImages(selectedFiles);
   };
 
   // Handle category change
@@ -60,26 +59,30 @@ const CreatePost = ({ user }: { user: TUSER }) => {
     formData.append("content", content);
     formData.append("category", category);
     formData.append("isPremium", isPremium.toString());
-    formData.append("user", user?._id); // Ensure user ID is valid
-
+    formData.append("user", user?._id);
     // Append images if any are selected
     if (images) {
       for (let i = 0; i < images.length; i++) {
-        formData.append("file", images[i]); // Match "file" key from Postman
+        formData.append("file", images[i]);
       }
     }
-    const accessToken = Cookies.get("accessToken");
+    const token = Cookies.get("accessToken");
     try {
-      // Log the FormData for debugging
-      formData.forEach((value, key) => {
-        console.log(`${key}: ${value}`);
-      });
       // Make the API request without Bearer Token
-      const response = await AxiosInstance.post("/post", { formData });
+      const response = await axios.post(
+        "http://localhost:5001/api/v1/post",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `${token}`,
+          },
+        }
+      );
 
       console.log("Post created successfully", response.data);
       toast.success("Post created successfully");
-      onClose(); // Close the modal after successful submission
+      onClose();
     } catch (error) {
       console.error("Error uploading post:", error);
       toast.error("Error creating post. Please try again.");
@@ -117,7 +120,7 @@ const CreatePost = ({ user }: { user: TUSER }) => {
                   <Image
                     alt="User Profile"
                     className="w-10 h-10 rounded-full"
-                    src={user?.image || defaultImage}
+                    src={user?.image}
                   />
                 </div>
                 <Input
